@@ -1,0 +1,20 @@
+{
+    "Author": "Gisela Torres",
+    "ContentSize": 2601,
+    "ContentUrl": "https://raw.githubusercontent.com/azureautomation/shutdownstart-vms-(asm-and-arm)-by-resource-group/master/Shutdown-Start-VMs-By-Resource-Group.ps1",
+    "DownloadCount": 16776,
+    "Id": "Shutdown-VMs-ASM-and-ARM-4166b862",
+    "IsFederated": false,
+    "IsWorkflow": true,
+    "Popularity": 49,
+    "RaterCount": 2,
+    "Rating": 4.5,
+    "ReleaseDate": "2015-12-12T00:00:00",
+    "RunbookKind": 6,
+    "RunbookKindString": "PowerShell Workflow",
+    "Summary": "This script shutdowns/starts VMs (both ASM and ARM) by a given resource group name in sequence.You have to create a run as account with the name AzureRunAsConnection\u00a0in order to access your account. You can create it automatically when you create your automation account.You",
+    "Title": "Shutdown/Start VMs (ASM and ARM) by resource group",
+    "UpdatedDate": "2018-11-16T00:00:00",
+    "Url": "https://github.com/azureautomation/shutdownstart-vms-(asm-and-arm)-by-resource-group",
+    "UserTags": "Utility, Windows Azure Virtual Machines, PowerShell Workflow"
+}
