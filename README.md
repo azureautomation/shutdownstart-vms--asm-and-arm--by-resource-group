@@ -1,19 +1,12 @@
-﻿Shutdown/Start VMs (ASM and ARM) by resource group
+﻿Shutdown/Start VMs by resource group
 ==================================================
 
             
 
-This script shutdowns/starts VMs (both ASM and ARM) by a given resource group name in sequence.
+This script shutdowns/starts VMs by a given resource group name in sequence.
 
 
- 
-
-
-You have to create a run as account with the name **
-AzureRunAsConnection **in order to access your account. You can create it automatically when you create your automation account.
-
-
-You can know more about this script here: [https://www.returngis.net](https://www.returngis.net)
+An Azure Automation account with System Assigned Managed Identity with the correct permissions is required for this to work correctly. You can read more about System Assigned Managed Identity here https://learn.microsoft.com/en-us/azure/automation/enable-managed-identity-for-automation
 
         
     

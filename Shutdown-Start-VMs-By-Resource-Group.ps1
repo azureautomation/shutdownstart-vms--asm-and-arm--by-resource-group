@@ -4,35 +4,27 @@ workflow Shutdown-Start-VMs-By-Resource-Group
     (   
         [Parameter(Mandatory=$true)]
         [String]
+        $SubscriptionId,
+        [Parameter(Mandatory=$true)]
+        [String]
         $AzureResourceGroup,
-		[Parameter(Mandatory=$true)]
+	[Parameter(Mandatory=$true)]
         [Boolean]
-		$Shutdown
+	$Shutdown
     )
 	
-	$connectionName = "AzureRunAsConnection"
+    #Please enable appropriate RBAC permissions to the system identity of this automation account. Otherwise, the runbook may fail...
 
     try
     {
-        # Get the connection "AzureRunAsConnection "
-        $servicePrincipalConnection=Get-AutomationConnection -Name $connectionName         
-
-        "Logging in to Azure..."
-        Add-AzureRmAccount `
-            -ServicePrincipal `
-            -TenantId $servicePrincipalConnection.TenantId `
-            -ApplicationId $servicePrincipalConnection.ApplicationId `
-            -CertificateThumbprint $servicePrincipalConnection.CertificateThumbprint 
+        "Logging in to Azure..." 
+        Disable-AzContextAutosave -Scope Process 
+        Connect-AzAccount -Identity
+        $AzureContext = Set-AzContext -SubscriptionId $SubscriptionId    
     }
     catch {
-        if (!$servicePrincipalConnection)
-        {
-            $ErrorMessage = "Connection $connectionName not found."
-            throw $ErrorMessage
-        } else{
-            Write-Error -Message $_.Exception
-            throw $_.Exception
-        }
+        Write-Error -Message $_.Exception
+        throw $_.Exception
     }
 	
 	if($Shutdown -eq $true){
@@ -45,48 +37,17 @@ workflow Shutdown-Start-VMs-By-Resource-Group
 	#ARM VMs
 	Write-Output "ARM VMs:";
 	  
-	Get-AzureRmVM -ResourceGroupName $AzureResourceGroup | ForEach-Object {
+	Get-AzVM -ResourceGroupName $AzureResourceGroup -DefaultProfile $AzureContext | ForEach-Object {
 	
 		if($Shutdown -eq $true){
 			
 				Write-Output "Stopping '$($_.Name)' ...";
-				Stop-AzureRmVM -ResourceGroupName $AzureResourceGroup -Name $_.Name -Force;
+				Stop-AzVM -ResourceGroupName $AzureResourceGroup -Name $_.Name -DefaultProfile $AzureContext -Force;
 		}
 		else{
 			Write-Output "Starting '$($_.Name)' ...";			
-			Start-AzureRmVM -ResourceGroupName $AzureResourceGroup -Name $_.Name;			
+			Start-AzVM -ResourceGroupName $AzureResourceGroup -Name $_.Name -DefaultProfile $AzureContext;			
 		}			
 	};
-	
-	
-	#ASM VMs
-	Write-Output "ASM VMs:";
-	
-	Get-AzureRmResource | where { $_.ResourceGroupName -match $AzureResourceGroup -and $_.ResourceType -eq "Microsoft.ClassicCompute/VirtualMachines"} | ForEach-Object {
-		
-		$vmName = $_.Name;
-		if($Shutdown -eq $true){
-			
-			Get-AzureVM | where {$_.Name -eq $vmName} | ForEach-Object {
-				Write-Output "The machine '$($_.Name)' is $($_.PowerState)";
-				
-				if($_.PowerState -eq "Started"){
-					Write-Output "Stopping '$($_.Name)' ...";		
-					Stop-AzureVM -ServiceName $_.ServiceName -Name $_.Name -Force;
-				}
-			}
-		}
-		else{
-			
-			Get-AzureVM | where {$_.Name -eq $vmName} | ForEach-Object {
-				Write-Output "The machine '$($_.Name)' is $($_.PowerState)";
-								
-				if($_.PowerState -eq "Stopped"){
-					Write-Output "Starting '$($_.Name)' ...";		
-					Start-AzureVM -ServiceName $_.ServiceName -Name $_.Name;
-				}
-			}
-		}		
-	};
-}
 
+}
